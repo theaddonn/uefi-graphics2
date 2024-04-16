@@ -1,0 +1,15 @@
+[package]
+name = "uefi-graphics2"
+version = "0.1.0"
+edition = "2021"
+authors = ["Adrian8115"]
+readme = "README.md"
+description = "An embedded-graphics display driver for UEFI environments"
+repository = "https://github.com/Adrian8115/uefi-graphics2"
+license = "GPL-3"
+keywords = ["uefi", "graphics", "no-std", "embedded"]
+categories = ["no-std", "embedded", "hardware-support"]
+
+[dependencies]
+uefi = "^0.27"
+embedded-graphics = "^0.8"
