@@ -19,7 +19,7 @@ sadly both seem to either lack functionality or are unmaintained
 
 ## Example
 
-Here is a simple example with utilising the [`uefi`](https://crates.io/crates/uefi) crate on version `0.27.0`:
+Here is a simple example with utilising the [`uefi`](https://crates.io/crates/uefi) crate on version `0.28.0`:
 
 ```rust
 #![no_main]
@@ -35,7 +35,7 @@ use uefi_graphics2::UefiDisplay;
 
 #[entry]
 fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Status {
-  uefi_services::init(&mut boot_system_table).unwrap();
+  uefi::helpers::init(&mut boot_system_table).unwrap();
 
   // Disable the watchdog timer
   boot_system_table
@@ -45,14 +45,22 @@ fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Stat
 
   let boot_services = boot_system_table.boot_services();
   
+  // Get gop
   let gop_handle = boot_services.get_handle_for_protocol::<GraphicsOutput>().unwrap();
   let mut gop = boot_services.open_protocol_exclusive::<GraphicsOutput>(gop_handle).unwrap();
   
+  // Create UefiDisplay
   let mode = gop.current_mode_info();
   let mut display = UefiDisplay::new(gop.frame_buffer(), mode);
 
-  let _ = display.fill_entire(Rgb888::CYAN);
+  // Tint the entire screen cyan
+  display.fill_entire(Rgb888::CYAN).unwrap();
+  
+  // Draw everything
   display.flush();
+
+  // wait 10000000 microseconds (10 seconds)
+  boot_services.stall(10_000_000);
   
   Status::SUCCESS
 }
