@@ -39,29 +39,42 @@ pub struct UefiDisplay {
 }
 
 impl UefiDisplay {
-    pub fn new(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Self {
-        Self {
+    pub unsafe fn new(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Self {
+        let mut display = Self {
             frame_buffer: frame_buffer.as_mut_ptr(),
             double_buffer: Vec::with_capacity(
                 mode_info.resolution().0 * mode_info.resolution().1 * 4,
             )
-            .as_mut_ptr(),
+                .as_mut_ptr(),
             stride: mode_info.stride() as u32,
             size: (
                 mode_info.resolution().0 as u32,
                 mode_info.resolution().1 as u32,
             ),
             buffer_size: (mode_info.resolution().0 * mode_info.resolution().1 * 4) as u64,
+        };
+
+        match display.fill_entire(Rgb888::BLACK) {
+            Ok(_) => {}
+            Err(_) => {}
         }
+
+        display
     }
 
-    pub fn new_custom(frame_buffer: *mut u8, stride: u32, size: (u32, u32)) -> Self {
+    pub unsafe fn new_unsafe(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Self {
         Self {
-            frame_buffer,
-            double_buffer: Vec::with_capacity((size.0 * size.1 * 4) as usize).as_mut_ptr(),
-            stride,
-            size,
-            buffer_size: (size.0 * size.1 * 4) as u64,
+            frame_buffer: frame_buffer.as_mut_ptr(),
+            double_buffer: Vec::with_capacity(
+                mode_info.resolution().0 * mode_info.resolution().1 * 4,
+            )
+                .as_mut_ptr(),
+            stride: mode_info.stride() as u32,
+            size: (
+                mode_info.resolution().0 as u32,
+                mode_info.resolution().1 as u32,
+            ),
+            buffer_size: (mode_info.resolution().0 * mode_info.resolution().1 * 4) as u64,
         }
     }
 
@@ -123,7 +136,7 @@ impl DrawTarget for UefiDisplay {
             let stride: u64 = self.stride as u64;
             let (x, y): (u64, u64) = (point.x as u64, point.y as u64);
 
-            let index: u64 = match (((y * stride) + x) * 4).try_into() {
+            let index: u64 = match y.overflowing_mul(stride).0.overflowing_add(x).0.overflowing_mul(4).0.try_into() {
                 Ok(index) => index,
                 Err(_) => return Err(UefiDisplayError::UnsupportedFormat),
             };
