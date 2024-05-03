@@ -46,7 +46,7 @@ impl UefiDisplay {
             double_buffer: Vec::with_capacity(
                 mode_info.resolution().0 * mode_info.resolution().1 * 4,
             )
-                .as_mut_ptr(),
+            .as_mut_ptr(),
             stride: mode_info.stride() as u32,
             size: (
                 mode_info.resolution().0 as u32,
@@ -69,7 +69,7 @@ impl UefiDisplay {
             double_buffer: Vec::with_capacity(
                 mode_info.resolution().0 * mode_info.resolution().1 * 4,
             )
-                .as_mut_ptr(),
+            .as_mut_ptr(),
             stride: mode_info.stride() as u32,
             size: (
                 mode_info.resolution().0 as u32,
@@ -149,7 +149,15 @@ impl DrawTarget for UefiDisplay {
             let stride: u64 = self.stride as u64;
             let (x, y): (u64, u64) = (point.x as u64, point.y as u64);
 
-            let index: u64 = match y.overflowing_mul(stride).0.overflowing_add(x).0.overflowing_mul(4).0.try_into() {
+            let index: u64 = match y
+                .overflowing_mul(stride)
+                .0
+                .overflowing_add(x)
+                .0
+                .overflowing_mul(4)
+                .0
+                .try_into()
+            {
                 Ok(index) => index,
                 Err(_) => return Err(UefiDisplayError::UnsupportedFormat),
             };
