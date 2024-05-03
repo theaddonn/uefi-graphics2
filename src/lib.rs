@@ -29,6 +29,7 @@ impl Display for UefiDisplayError {
     }
 }
 
+#[derive(Debug)]
 pub struct UefiDisplay {
     frame_buffer: *mut u8,
     double_buffer: *mut u8,
