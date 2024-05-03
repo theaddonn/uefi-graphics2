@@ -3,17 +3,17 @@
 extern crate alloc;
 
 use alloc::vec::Vec;
-use core::{fmt::Display, ptr::copy};
 use core::fmt::{Formatter, Write};
+use core::{fmt::Display, ptr::copy};
 
 // for re-export
 pub use embedded_graphics;
 use embedded_graphics::draw_target::DrawTarget;
 use embedded_graphics::geometry::{OriginDimensions, Size};
-use embedded_graphics::Pixel;
 use embedded_graphics::pixelcolor::{IntoStorage, Rgb888, RgbColor};
 use embedded_graphics::prelude::Point;
 use embedded_graphics::primitives::Rectangle;
+use embedded_graphics::Pixel;
 use uefi::proto::console::gop::{FrameBuffer, ModeInfo};
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
@@ -24,9 +24,7 @@ pub enum UefiDisplayError {
 impl Display for UefiDisplayError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
-            UefiDisplayError::UnsupportedFormat => {
-                f.write_str("Unsupported Color Format")
-            }
+            UefiDisplayError::UnsupportedFormat => f.write_str("Unsupported Color Format"),
         }
     }
 }
@@ -44,7 +42,10 @@ impl UefiDisplay {
     pub fn new(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Self {
         Self {
             frame_buffer: frame_buffer.as_mut_ptr(),
-            double_buffer: Vec::with_capacity(mode_info.resolution().0 * mode_info.resolution().1 * 4).as_mut_ptr(),
+            double_buffer: Vec::with_capacity(
+                mode_info.resolution().0 * mode_info.resolution().1 * 4,
+            )
+            .as_mut_ptr(),
             stride: mode_info.stride() as u32,
             size: (
                 mode_info.resolution().0 as u32,
@@ -80,10 +81,7 @@ impl UefiDisplay {
     pub fn fill_entire(&mut self, color: Rgb888) -> Result<(), UefiDisplayError> {
         self.fill_solid(
             &Rectangle {
-                top_left: Point {
-                    x: 0,
-                    y: 0,
-                },
+                top_left: Point { x: 0, y: 0 },
                 size: Size {
                     width: self.size.0,
                     height: self.size.1,
@@ -94,7 +92,13 @@ impl UefiDisplay {
     }
 
     pub fn flush(&mut self) {
-        unsafe { copy(self.double_buffer, self.frame_buffer, self.buffer_size as usize) }
+        unsafe {
+            copy(
+                self.double_buffer,
+                self.frame_buffer,
+                self.buffer_size as usize,
+            )
+        }
     }
 }
 
@@ -109,8 +113,8 @@ impl DrawTarget for UefiDisplay {
     type Error = UefiDisplayError;
 
     fn draw_iter<I>(&mut self, pixels: I) -> Result<(), Self::Error>
-        where
-            I: IntoIterator<Item=Pixel<Self::Color>>,
+    where
+        I: IntoIterator<Item = Pixel<Self::Color>>,
     {
         let pixels = pixels.into_iter();
 
