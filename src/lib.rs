@@ -78,6 +78,10 @@ impl UefiDisplay {
         }
     }
 
+    /// Resizes the given UefiDisplay and clears the data in the frame buffer.
+    ///
+    /// The supplied frame buffer for `new`/`new_unsafe` needs to be adjusted manually,
+    /// if it didn't already happen.
     pub fn resize(&mut self, size: (u32, u32)) -> Result<(), UefiDisplayError> {
         self.size = (size.0, size.1);
         self.frame_buffer = Vec::with_capacity((size.0 * size.1 * 4) as usize).as_mut_ptr();
@@ -86,11 +90,17 @@ impl UefiDisplay {
         self.fill_entire(Rgb888::BLACK)
     }
 
+    /// Resizes the given UefiDisplay.
+    /// (does not clear the data in the frame buffer, data might get corrupted)
+    ///
+    /// The supplied frame buffer for `new`/`new_unsafe` needs to be adjusted manually,
+    /// if it didn't already happen.
     pub unsafe fn resize_unsafe(&mut self, size: (u32, u32)) {
         self.size = (size.0, size.1);
         self.frame_buffer = Vec::with_capacity((size.0 * size.1 * 4) as usize).as_mut_ptr();
     }
 
+    /// Fills the entire screen with a given color.
     pub fn fill_entire(&mut self, color: Rgb888) -> Result<(), UefiDisplayError> {
         self.fill_solid(
             &Rectangle {
@@ -104,6 +114,8 @@ impl UefiDisplay {
         )
     }
 
+    /// Copies the framebuffer into the uefi framebuffer.
+    /// This function is needed to draw everything.
     pub fn flush(&mut self) {
         unsafe {
             copy(
