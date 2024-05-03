@@ -25,7 +25,7 @@ pub struct UefiDisplay {
     stride: u32,
     size: (u32, u32),
     // width * height * 4 (red, green, blue, reserved)
-    buffer_size: u32,
+    buffer_size: u64,
 }
 
 impl UefiDisplay {
@@ -38,7 +38,7 @@ impl UefiDisplay {
                 mode_info.resolution().0 as u32,
                 mode_info.resolution().1 as u32,
             ),
-            buffer_size: mode_info.resolution().0 as u32 * mode_info.resolution().1 as u32 * 4,
+            buffer_size: (mode_info.resolution().0 * mode_info.resolution().1 * 4) as u64,
         }
     }
 
@@ -48,7 +48,7 @@ impl UefiDisplay {
             double_buffer: Vec::with_capacity((size.0 * size.1 * 4) as usize).as_mut_ptr(),
             stride,
             size,
-            buffer_size: size.0 * size.1 * 4,
+            buffer_size: (size.0 * size.1 * 4) as u64,
         }
     }
 
@@ -107,12 +107,12 @@ impl DrawTarget for UefiDisplay {
             let stride = self.stride as u64;
             let (x, y) = (point.x as u64, point.y as u64);
 
-            let index: usize = match (((y * stride) + x) * 4).try_into() {
+            let index: u64 = match (((y * stride) + x) * 4).try_into() {
                 Ok(index) => index,
                 Err(_) => return Err(UefiDisplayError::UnsupportedFormat),
             };
 
-            unsafe { (self.double_buffer.add(index) as *mut u32).write_volatile(bytes) };
+            unsafe { (self.double_buffer.add(index as usize) as *mut u32).write_volatile(bytes) };
         }
 
         Ok(())
