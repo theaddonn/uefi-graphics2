@@ -119,9 +119,9 @@ impl DrawTarget for UefiDisplay {
         let pixels = pixels.into_iter();
 
         for Pixel(point, color) in pixels {
-            let bytes = color.into_storage();
-            let stride = self.stride as u64;
-            let (x, y) = (point.x as u64, point.y as u64);
+            let bytes: u32 = color.into_storage();
+            let stride: u64 = self.stride as u64;
+            let (x, y): (u64, u64) = (point.x as u64, point.y as u64);
 
             let index: u64 = match (((y * stride) + x) * 4).try_into() {
                 Ok(index) => index,
