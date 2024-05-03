@@ -3,7 +3,7 @@
 extern crate alloc;
 
 use alloc::vec::Vec;
-use core::fmt::{Formatter, Write};
+use core::fmt::Formatter;
 use core::{fmt::Display, ptr::copy};
 
 // for re-export
