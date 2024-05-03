@@ -40,7 +40,7 @@ pub struct UefiDisplay {
 }
 
 impl UefiDisplay {
-    pub unsafe fn new(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Self {
+    pub fn new(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Self {
         let mut display = Self {
             frame_buffer: frame_buffer.as_mut_ptr(),
             double_buffer: Vec::with_capacity(
