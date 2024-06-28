@@ -24,7 +24,7 @@ sadly both seem to either lack functionality or are unmaintained
 
 ## Example
 
-Here is a simple example with utilising the [`uefi`](https://crates.io/crates/uefi) crate on version `0.28.0`:
+Here is a simple example with using the [`uefi`](https://crates.io/crates/uefi) crate on version `0.28.0`:
 
 ```rust
 #![no_main]
@@ -70,6 +70,8 @@ fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Stat
     Status::SUCCESS
 }
 ```
+
+More example can be found in the example directory [`uefi-graphics2/examples`](https://github.com/Adrian8115/uefi-graphics2/tree/main/examples).
 
 ## Contributing and Updating
 
