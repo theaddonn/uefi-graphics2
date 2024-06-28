@@ -7,6 +7,8 @@ pub enum UefiDisplayError {
 
 impl Display for UefiDisplayError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        write!(f, "Unsupported Color Format")
+        match self {
+            Self::UefiDisplayError => { write!(f, "Unsupported Color Format") }
+        }
     }
 }
