@@ -1,5 +1,7 @@
 #![no_std]
 
+mod error;
+
 extern crate alloc;
 
 use alloc::vec::Vec;
@@ -15,19 +17,6 @@ use embedded_graphics::prelude::Point;
 use embedded_graphics::primitives::Rectangle;
 use embedded_graphics::Pixel;
 use uefi::proto::console::gop::{FrameBuffer, ModeInfo};
-
-#[derive(Debug, Eq, PartialEq, Copy, Clone)]
-pub enum UefiDisplayError {
-    UnsupportedFormat,
-}
-
-impl Display for UefiDisplayError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        match self {
-            UefiDisplayError::UnsupportedFormat => f.write_str("Unsupported Color Format"),
-        }
-    }
-}
 
 #[derive(Debug)]
 pub struct UefiDisplay {
