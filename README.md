@@ -1,4 +1,7 @@
 # Uefi-graphics2
+![Crates.io Version](https://img.shields.io/crates/v/uefi-graphics2)
+![Crates.io Total Downloads](https://img.shields.io/crates/d/uefi-graphics2)
+![Crates.io License](https://img.shields.io/crates/l/uefi-graphics2)
 
 A blazingly fast embedded-graphics display driver for UEFI environments,
 using the [`embedded-graphics`](https://crates.io/crates/embedded-graphics) crate
