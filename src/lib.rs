@@ -2,7 +2,7 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
-use core::{fmt::Display, ptr::copy};
+use core::ptr::copy;
 
 // for re-export
 pub use embedded_graphics;
