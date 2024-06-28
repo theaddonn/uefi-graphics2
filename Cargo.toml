@@ -1,6 +1,6 @@
 [package]
 name = "uefi-graphics2"
-version = "0.1.3"
+version = "0.2.0"
 edition = "2021"
 authors = ["Adrian8115"]
 readme = "README.md"
