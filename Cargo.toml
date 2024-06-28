@@ -13,3 +13,4 @@ categories = ["no-std", "embedded", "hardware-support"]
 [dependencies]
 uefi = "0.28"
 embedded-graphics = "0.8"
+thiserror = "1.0"
