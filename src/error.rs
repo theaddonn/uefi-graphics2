@@ -1,4 +1,5 @@
-use core::fmt::{Display, Formatter};
+use core::fmt::Display;
+
 use thiserror::Error;
 
 #[derive(Error, Debug, Eq, PartialEq, Copy, Clone)]

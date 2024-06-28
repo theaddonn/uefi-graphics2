@@ -1,11 +1,7 @@
 #![no_std]
 
-mod error;
-
 extern crate alloc;
-
 use alloc::vec::Vec;
-use core::fmt::Formatter;
 use core::{fmt::Display, ptr::copy};
 
 // for re-export
@@ -17,6 +13,10 @@ use embedded_graphics::prelude::Point;
 use embedded_graphics::primitives::Rectangle;
 use embedded_graphics::Pixel;
 use uefi::proto::console::gop::{FrameBuffer, ModeInfo};
+
+use crate::error::UefiDisplayError;
+
+mod error;
 
 #[derive(Debug)]
 pub struct UefiDisplay {
@@ -70,7 +70,7 @@ impl UefiDisplay {
 
     /// Resizes the given UefiDisplay and clears the data in the frame buffer.
     ///
-    /// The supplied frame buffer for `new`/`new_unsafe` needs to be adjusted manually,
+    /// The supplied frame buffer for `new`/`new_unsafe` needs to be adjusted manually
     /// if it didn't already happen.
     pub fn resize(&mut self, size: (u32, u32)) -> Result<(), UefiDisplayError> {
         self.size = (size.0, size.1);
@@ -83,7 +83,7 @@ impl UefiDisplay {
     /// Resizes the given UefiDisplay.
     /// (does not clear the data in the frame buffer, data might get corrupted)
     ///
-    /// The supplied frame buffer for `new`/`new_unsafe` needs to be adjusted manually,
+    /// The supplied frame buffer for `new`/`new_unsafe` needs to be adjusted manually
     /// if it didn't already happen.
     pub unsafe fn resize_unsafe(&mut self, size: (u32, u32)) {
         self.size = (size.0, size.1);
