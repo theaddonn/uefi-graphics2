@@ -35,7 +35,7 @@ pub struct UefiDisplay {
     double_buffer: *mut u8,
     stride: u32,
     size: (u32, u32),
-    // width * height * 4 (red, green, blue, reserved)
+    // width * height * 4 (4 = red + green + blue + reserved)
     buffer_size: u64,
 }
 
