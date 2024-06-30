@@ -6,7 +6,6 @@ use core::ptr::copy;
 
 // for re-export
 pub use embedded_graphics;
-pub use crate::error::UefiDisplayError;
 use embedded_graphics::draw_target::DrawTarget;
 use embedded_graphics::geometry::{OriginDimensions, Size};
 use embedded_graphics::pixelcolor::{IntoStorage, Rgb888, RgbColor};
@@ -14,6 +13,8 @@ use embedded_graphics::prelude::Point;
 use embedded_graphics::primitives::Rectangle;
 use embedded_graphics::Pixel;
 use uefi::proto::console::gop::{FrameBuffer, ModeInfo};
+
+pub use crate::error::UefiDisplayError;
 
 pub mod error;
 

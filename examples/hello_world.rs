@@ -3,11 +3,11 @@
 
 extern crate alloc;
 
-use embedded_graphics::Drawable;
 use embedded_graphics::geometry::Point;
 use embedded_graphics::mono_font::ascii::FONT_6X10;
-use embedded_graphics::mono_font::{MonoFont, MonoTextStyle};
-use embedded_graphics::text::{Text, TextStyle};
+use embedded_graphics::mono_font::MonoTextStyle;
+use embedded_graphics::text::Text;
+use embedded_graphics::Drawable;
 use uefi::prelude::*;
 use uefi::proto::console::gop::GraphicsOutput;
 
@@ -27,8 +27,12 @@ fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Stat
     let boot_services = boot_system_table.boot_services();
 
     // Get gop
-    let gop_handle = boot_services.get_handle_for_protocol::<GraphicsOutput>().unwrap();
-    let mut gop = boot_services.open_protocol_exclusive::<GraphicsOutput>(gop_handle).unwrap();
+    let gop_handle = boot_services
+        .get_handle_for_protocol::<GraphicsOutput>()
+        .unwrap();
+    let mut gop = boot_services
+        .open_protocol_exclusive::<GraphicsOutput>(gop_handle)
+        .unwrap();
 
     // Create UefiDisplay
     let mode = gop.current_mode_info();
@@ -38,7 +42,7 @@ fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Stat
     let style = MonoTextStyle::new(&FONT_6X10, Rgb888::WHITE);
 
     // Create a new text
-    let text = Text::new("Hello World!", Point {x: 30, y: 100}, style);
+    let text = Text::new("Hello World!", Point { x: 30, y: 100 }, style);
 
     // Draw the text on the display
     text.draw(&mut display).unwrap();

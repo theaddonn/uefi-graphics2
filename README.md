@@ -71,7 +71,8 @@ fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Stat
 }
 ```
 
-More example can be found in the example directory [`uefi-graphics2/examples`](https://github.com/Adrian8115/uefi-graphics2/tree/main/examples).
+More example can be found in the example
+directory [`uefi-graphics2/examples`](https://github.com/Adrian8115/uefi-graphics2/tree/main/examples).
 
 ## Contributing and Updating
 

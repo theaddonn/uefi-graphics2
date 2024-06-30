@@ -22,8 +22,12 @@ fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Stat
     let boot_services = boot_system_table.boot_services();
 
     // Get gop
-    let gop_handle = boot_services.get_handle_for_protocol::<GraphicsOutput>().unwrap();
-    let mut gop = boot_services.open_protocol_exclusive::<GraphicsOutput>(gop_handle).unwrap();
+    let gop_handle = boot_services
+        .get_handle_for_protocol::<GraphicsOutput>()
+        .unwrap();
+    let mut gop = boot_services
+        .open_protocol_exclusive::<GraphicsOutput>(gop_handle)
+        .unwrap();
 
     // Create UefiDisplay
     let mode = gop.current_mode_info();
