@@ -80,3 +80,5 @@ If any dependencies are outdated, bugs occur or features are requested,
 please notify me and create an issue.
 
 Contributing is appreciated as well, feel free to create a pull request.
+
+If you like this project dont forget to leave a star on github!
