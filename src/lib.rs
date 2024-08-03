@@ -53,6 +53,14 @@ impl UefiDisplay {
         }
     }
 
+    /// # Safety
+    ///
+    /// In [UefiDisplay::new] the screen gets set to a default color (Black).
+    /// But [UefiDisplay::new_unsafe] doesn't do that,
+    /// this may lead to a corrupted screen with a default color
+    /// (Tests show that the screen may be initialized with a grayish color).
+    /// This can easily be fixed by just using
+    /// [UefiDisplay::new].
     pub unsafe fn new_unsafe(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Self {
         Self {
             frame_buffer: frame_buffer.as_mut_ptr(),
@@ -82,10 +90,16 @@ impl UefiDisplay {
     }
 
     /// Resizes the given UefiDisplay.
-    /// (does not clear the data in the frame buffer, data might get corrupted)
     ///
     /// The supplied frame buffer for `new`/`new_unsafe` needs to be adjusted manually
     /// if it didn't already happen.
+    ///
+    /// # Safety
+    ///
+    /// In [UefiDisplay::resize] the screen gets cleared to a default color (Black).
+    /// But [UefiDisplay::resize_unsafe] does not clear the data in the frame buffer,
+    /// existing data might get corrupted. This can easily be fixed by just using
+    /// [UefiDisplay::resize].
     pub unsafe fn resize_unsafe(&mut self, size: (u32, u32)) {
         self.size = (size.0, size.1);
         self.frame_buffer = Vec::with_capacity((size.0 * size.1 * 4) as usize).as_mut_ptr();
