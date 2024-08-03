@@ -29,7 +29,7 @@ pub struct UefiDisplay {
 }
 
 impl UefiDisplay {
-    pub fn new(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Self {
+    pub fn new(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Result<Self, UefiDisplayError> {
         let mut display = Self {
             frame_buffer: frame_buffer.as_mut_ptr(),
             double_buffer: Vec::with_capacity(
@@ -45,11 +45,9 @@ impl UefiDisplay {
         };
 
         match display.fill_entire(Rgb888::BLACK) {
-            Ok(_) => {}
-            Err(_) => {}
+            Ok(_) => { Ok(display) }
+            Err(e) => { Err(e) }
         }
-
-        display
     }
 
     pub unsafe fn new_unsafe(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Self {
@@ -138,18 +136,12 @@ impl DrawTarget for UefiDisplay {
             let stride: u64 = self.stride as u64;
             let (x, y): (u64, u64) = (point.x as u64, point.y as u64);
 
-            let index: u64 = match y
-                .overflowing_mul(stride)
-                .0
-                .overflowing_add(x)
-                .0
-                .overflowing_mul(4)
-                .0
+            let index: u64 = y
+                .overflowing_mul(stride).0
+                .overflowing_add(x).0
+                .overflowing_mul(4).0
                 .try_into()
-            {
-                Ok(index) => index,
-                Err(_) => return Err(UefiDisplayError::UnsupportedFormat),
-            };
+                .map_err(|_| UefiDisplayError::UnsupportedFormat)?;
 
             unsafe { (self.double_buffer.add(index as usize) as *mut u32).write_volatile(bytes) };
         }
