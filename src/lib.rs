@@ -145,9 +145,7 @@ impl DrawTarget for UefiDisplay {
                 .overflowing_add(x)
                 .0
                 .overflowing_mul(4)
-                .0
-                .try_into()
-                .map_err(|_| UefiDisplayError::UnsupportedFormat)?;
+                .0;
 
             unsafe { (self.double_buffer.add(index as usize) as *mut u32).write_volatile(bytes) };
         }
