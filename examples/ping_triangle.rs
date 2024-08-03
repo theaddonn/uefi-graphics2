@@ -36,10 +36,19 @@ fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Stat
     let mut display = UefiDisplay::new(gop.frame_buffer(), mode).unwrap();
 
     // Create a new triangle
-    let triangle = Triangle::new(Point { x: 30, y: 100 }, Point { x: 230, y: 130 }, Point { x: 110, y: 300 });
+    let triangle = Triangle::new(
+        Point { x: 30, y: 100 },
+        Point { x: 230, y: 130 },
+        Point { x: 110, y: 300 },
+    );
 
     // Draw the text on the display
-    triangle.draw_styled(&mut PrimitiveStyle::with_fill(Rgb888::CSS_PINK), &mut display).unwrap();
+    triangle
+        .draw_styled(
+            &mut PrimitiveStyle::with_fill(Rgb888::CSS_PINK),
+            &mut display,
+        )
+        .unwrap();
 
     // Flush everything
     display.flush();

@@ -37,10 +37,18 @@ fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Stat
     let mut display = UefiDisplay::new(gop.frame_buffer(), mode).unwrap();
 
     // Create a new rectangle
-    let rectangle = Rectangle::new(Point { x: 30, y: 100 }, Size { width: 300, height: 150 });
+    let rectangle = Rectangle::new(
+        Point { x: 30, y: 100 },
+        Size {
+            width: 300,
+            height: 150,
+        },
+    );
 
     // Draw the text on the display
-    rectangle.draw_styled(&mut PrimitiveStyle::with_fill(Rgb888::YELLOW), &mut display).unwrap();
+    rectangle
+        .draw_styled(&mut PrimitiveStyle::with_fill(Rgb888::YELLOW), &mut display)
+        .unwrap();
 
     // Flush everything
     display.flush();

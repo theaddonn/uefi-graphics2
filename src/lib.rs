@@ -29,7 +29,10 @@ pub struct UefiDisplay {
 }
 
 impl UefiDisplay {
-    pub fn new(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Result<Self, UefiDisplayError> {
+    pub fn new(
+        mut frame_buffer: FrameBuffer,
+        mode_info: ModeInfo,
+    ) -> Result<Self, UefiDisplayError> {
         let mut display = Self {
             frame_buffer: frame_buffer.as_mut_ptr(),
             double_buffer: Vec::with_capacity(
@@ -45,8 +48,8 @@ impl UefiDisplay {
         };
 
         match display.fill_entire(Rgb888::BLACK) {
-            Ok(_) => { Ok(display) }
-            Err(e) => { Err(e) }
+            Ok(_) => Ok(display),
+            Err(e) => Err(e),
         }
     }
 
@@ -137,9 +140,12 @@ impl DrawTarget for UefiDisplay {
             let (x, y): (u64, u64) = (point.x as u64, point.y as u64);
 
             let index: u64 = y
-                .overflowing_mul(stride).0
-                .overflowing_add(x).0
-                .overflowing_mul(4).0
+                .overflowing_mul(stride)
+                .0
+                .overflowing_add(x)
+                .0
+                .overflowing_mul(4)
+                .0
                 .try_into()
                 .map_err(|_| UefiDisplayError::UnsupportedFormat)?;
 
