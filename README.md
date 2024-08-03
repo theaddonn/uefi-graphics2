@@ -24,7 +24,7 @@ sadly both seem to either lack functionality or are unmaintained
 
 ## Example
 
-Here is a simple example with using the [`uefi`](https://crates.io/crates/uefi) crate on version `0.28.0`:
+Here is a simple example with using the [`uefi`](https://crates.io/crates/uefi) crate on version `0.30.0`:
 
 ```rust
 #![no_main]
