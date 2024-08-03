@@ -36,7 +36,7 @@ fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Stat
 
     // Create UefiDisplay
     let mode = gop.current_mode_info();
-    let mut display = UefiDisplay::new(gop.frame_buffer(), mode);
+    let mut display = UefiDisplay::new(gop.frame_buffer(), mode).unwrap();
 
     // Create a new character style
     let style = MonoTextStyle::new(&FONT_6X10, Rgb888::WHITE);

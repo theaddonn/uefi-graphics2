@@ -11,5 +11,21 @@ keywords = ["uefi", "graphics", "no-std", "embedded"]
 categories = ["no-std", "embedded", "hardware-support"]
 
 [dependencies]
-uefi = "0.30"
+uefi = { version = "0.30" }
 embedded-graphics = "0.8"
+
+[[example]]
+name = "cyan_display"
+required-features = [ "uefi/global_allocator" ]
+
+[[example]]
+name = "hello_world"
+required-features = [ "uefi/global_allocator" ]
+
+[[example]]
+name = "yellow_rectangle"
+required-features = [ "uefi/global_allocator" ]
+
+[[example]]
+name = "ping_triangle"
+required-features = [ "uefi/global_allocator" ]
