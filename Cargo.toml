@@ -2,7 +2,7 @@
 name = "uefi-graphics2"
 version = "0.3.1"
 edition = "2021"
-authors = ["Adrian8115"]
+authors = ["theaddonn <theaddonn@gmail.com>"]
 readme = "README.md"
 description = "An embedded-graphics display driver for UEFI environments"
 repository = "https://github.com/Adrian8115/uefi-graphics2"
