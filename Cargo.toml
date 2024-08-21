@@ -1,11 +1,11 @@
 [package]
 name = "uefi-graphics2"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 authors = ["theaddonn <theaddonn@gmail.com>"]
 readme = "README.md"
 description = "An embedded-graphics display driver for UEFI environments"
-repository = "https://github.com/theaddon/uefi-graphics2"
+repository = "https://github.com/theaddonn/uefi-graphics2"
 license = "Apache-2.0"
 keywords = ["uefi", "graphics", "no-std", "embedded"]
 categories = ["no-std", "embedded", "hardware-support"]
