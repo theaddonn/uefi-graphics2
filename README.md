@@ -2,7 +2,7 @@
 
 [![Crates.io Version](https://img.shields.io/crates/v/uefi-graphics2)](https://crates.io/crates/uefi-graphics2)
 [![Crates.io Total Downloads](https://img.shields.io/crates/d/uefi-graphics2)](https://crates.io/crates/uefi-graphics2)
-[![Crates.io License](https://img.shields.io/crates/l/uefi-graphics2)](https://github.com/Adrian8115/uefi-graphics2/blob/main/LICENSE)
+[![Crates.io License](https://img.shields.io/crates/l/uefi-graphics2)](https://github.com/theaddonn/uefi-graphics2/blob/main/LICENSE)
 
 A fast embedded-graphics display driver for UEFI environments,
 using the [`embedded-graphics`](https://crates.io/crates/embedded-graphics) crate
@@ -72,7 +72,7 @@ fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Stat
 ```
 
 More example can be found in the example
-directory [`uefi-graphics2/examples`](https://github.com/Adrian8115/uefi-graphics2/tree/main/examples).
+directory [`uefi-graphics2/examples`](https://github.com/theaddonn/uefi-graphics2/tree/main/examples).
 
 ## Contributing and Updating
 
