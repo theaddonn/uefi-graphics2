@@ -1,4 +1,4 @@
-# Uefi-graphics2
+# uefi-graphics2
 
 [![Crates.io Version](https://img.shields.io/crates/v/uefi-graphics2)](https://crates.io/crates/uefi-graphics2)
 [![Crates.io Total Downloads](https://img.shields.io/crates/d/uefi-graphics2)](https://crates.io/crates/uefi-graphics2)
