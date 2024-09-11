@@ -82,3 +82,7 @@ please notify me and create an issue.
 Contributing is appreciated as well, feel free to create a pull request.
 
 If you like this project dont forget to leave a star on github!
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=theaddonn/uefi-graphics2&type=Date)](https://star-history.com/#theaddonn/uefi-graphics2&Date)
