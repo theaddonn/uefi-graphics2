@@ -11,7 +11,7 @@ keywords = ["uefi", "graphics", "no-std", "embedded"]
 categories = ["no-std", "embedded", "hardware-support"]
 
 [dependencies]
-uefi = { version = "0.33" }
+uefi = { version = "0.34" }
 embedded-graphics = "0.8"
 
 [[example]]
