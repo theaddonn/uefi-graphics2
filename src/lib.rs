@@ -2,6 +2,7 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
+use core::marker::PhantomData;
 use core::ptr::copy;
 
 // for re-export
@@ -75,34 +76,6 @@ impl UefiDisplay {
             ),
             buffer_size: (mode_info.resolution().0 * mode_info.resolution().1 * 4) as u64,
         }
-    }
-
-    /// Resizes the given UefiDisplay and clears the data in the frame buffer.
-    ///
-    /// The supplied frame buffer for `new`/`new_unsafe` needs to be adjusted manually
-    /// if it didn't already happen.
-    pub fn resize(&mut self, size: (u32, u32)) -> Result<(), UefiDisplayError> {
-        self.size = (size.0, size.1);
-        self.frame_buffer = Vec::with_capacity((size.0 * size.1 * 4) as usize).as_mut_ptr();
-
-        // Reset the entire buffer because if not the existing data would be shifted around
-        self.fill_entire(Rgb888::BLACK)
-    }
-
-    /// Resizes the given UefiDisplay.
-    ///
-    /// The supplied frame buffer for `new`/`new_unsafe` needs to be adjusted manually
-    /// if it didn't already happen.
-    ///
-    /// # Safety
-    ///
-    /// In [UefiDisplay::resize] the screen gets cleared to a default color (Black).
-    /// But [UefiDisplay::resize_unsafe] does not clear the data in the frame buffer,
-    /// existing data might get corrupted. This can easily be fixed by just using
-    /// [UefiDisplay::resize].
-    pub unsafe fn resize_unsafe(&mut self, size: (u32, u32)) {
-        self.size = (size.0, size.1);
-        self.frame_buffer = Vec::with_capacity((size.0 * size.1 * 4) as usize).as_mut_ptr();
     }
 
     /// Fills the entire screen with a given color.
