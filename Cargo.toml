@@ -1,6 +1,6 @@
 [package]
 name = "uefi-graphics2"
-version = "0.4.3"
+version = "0.4.4"
 edition = "2021"
 authors = ["theaddonn <theaddonn@gmail.com>"]
 readme = "README.md"
@@ -11,7 +11,7 @@ keywords = ["uefi", "graphics", "no-std", "embedded"]
 categories = ["no-std", "embedded", "hardware-support"]
 
 [dependencies]
-uefi = { version = "0.32" }
+uefi = { version = "0.34" }
 embedded-graphics = "0.8"
 
 [[example]]
