@@ -1,14 +1,11 @@
-use core::fmt::{Display, Formatter};
+use thiserror::Error;
 
-#[derive(Debug, Eq, PartialEq, Copy, Clone)]
+#[derive(Error, Debug, Eq, PartialEq, Copy, Clone)]
 pub enum UefiDisplayError {
+    #[error("Unsupported Color Format")]
     UnsupportedFormat,
-}
-
-impl Display for UefiDisplayError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        match self {
-            UefiDisplayError::UnsupportedFormat => f.write_str("Unsupported Color Format"),
-        }
-    }
+    #[error("Invalid Resolution")]   
+    InvalidResolution,
+    #[error("Out of Bounds")]
+    OutOfBounds,
 }
