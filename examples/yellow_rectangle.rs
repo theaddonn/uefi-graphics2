@@ -13,24 +13,16 @@ use uefi::proto::console::gop::GraphicsOutput;
 use uefi_graphics2::UefiDisplay;
 
 #[entry]
-fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Status {
-    uefi::helpers::init(&mut boot_system_table).unwrap();
+fn main() -> Status {
+    uefi::helpers::init().unwrap();
 
     // Disable the watchdog timer
-    boot_system_table
-        .boot_services()
-        .set_watchdog_timer(0, 0x10000, None)
-        .unwrap();
 
-    let boot_services = boot_system_table.boot_services();
+    boot::set_watchdog_timer(0, 0x10000, None).unwrap();
 
     // Get gop
-    let gop_handle = boot_services
-        .get_handle_for_protocol::<GraphicsOutput>()
-        .unwrap();
-    let mut gop = boot_services
-        .open_protocol_exclusive::<GraphicsOutput>(gop_handle)
-        .unwrap();
+    let gop_handle = boot::get_handle_for_protocol::<GraphicsOutput>().unwrap();
+    let mut gop = boot::open_protocol_exclusive::<GraphicsOutput>(gop_handle).unwrap();
 
     // Create UefiDisplay
     let mode = gop.current_mode_info();
@@ -54,7 +46,7 @@ fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Stat
     display.flush();
 
     // wait 10000000 microseconds (10 seconds)
-    boot_services.stall(10_000_000);
+    boot::stall(10_000_000);
 
     Status::SUCCESS
 }
