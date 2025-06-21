@@ -5,22 +5,19 @@
 [![Crates.io License](https://img.shields.io/crates/l/uefi-graphics2)](https://github.com/theaddonn/uefi-graphics2/blob/main/LICENSE)
 
 A fast embedded-graphics display driver for UEFI environments,
-using the [`embedded-graphics`](https://crates.io/crates/embedded-graphics) crate
-as its base.
+using the [`embedded-graphics`](https://crates.io/crates/embedded-graphics) crate as its base.
 
 Supports:
 
 - [X] Double buffering
 - [X] Display resizing
-- [X] An extensive draw/render library using the
-  [`embedded-graphics`](https://crates.io/crates/embedded-graphics) crate
+- [X] An extensive draw/render library using the [`embedded-graphics`](https://crates.io/crates/embedded-graphics) crate
 
 ### Why are there 2 other crates for this job?
 
-[`uefi-graphics`](https://crates.io/crates/uefi-graphics) and
-[`uefi-graphics-driver`](https://crates.io/crates/uefi-graphics-driver)
-are 2 crates providing similar purpose,
-sadly both seem to either lack functionality or are unmaintained
+[`uefi-graphics`](https://crates.io/crates/uefi-graphics) and [`uefi-graphics-driver`](https://crates.io/crates/uefi-graphics-driver)
+are two crates providing similar functionality,
+sadly both seem to either lack some of the necessary functionality or are completely unmaintained
 
 ## Example
 
@@ -32,42 +29,48 @@ Here is a simple example with using the [`uefi`](https://crates.io/crates/uefi) 
 
 extern crate alloc;
 
+use embedded_graphics::geometry::Point;
+use embedded_graphics::mono_font::ascii::FONT_6X10;
+use embedded_graphics::mono_font::MonoTextStyle;
+use embedded_graphics::pixelcolor::Rgb888;
+use embedded_graphics::text::Text;
+use embedded_graphics::Drawable;
 use uefi::prelude::*;
 use uefi::proto::console::gop::GraphicsOutput;
 
-use uefi_graphics2::embedded_graphics::pixelcolor::{Rgb888, RgbColor};
 use uefi_graphics2::UefiDisplay;
 
 #[entry]
-fn main(_image_handle: Handle, mut boot_system_table: SystemTable<Boot>) -> Status {
-    uefi::helpers::init(&mut boot_system_table).unwrap();
+fn main() -> Status {
+  uefi::helpers::init().unwrap();
 
-    // Disable the watchdog timer
-    boot_system_table
-        .boot_services()
-        .set_watchdog_timer(0, 0x10000, None)
-        .unwrap();
+  // Disable the watchdog timer
+  boot::set_watchdog_timer(0, 0x10000, None).unwrap();
 
-    let boot_services = boot_system_table.boot_services();
+  // Get gop
+  let gop_handle = boot::get_handle_for_protocol::<GraphicsOutput>().unwrap();
+  let mut gop = boot::open_protocol_exclusive::<GraphicsOutput>(gop_handle).unwrap();
 
-    // Get gop
-    let gop_handle = boot_services.get_handle_for_protocol::<GraphicsOutput>().unwrap();
-    let mut gop = boot_services.open_protocol_exclusive::<GraphicsOutput>(gop_handle).unwrap();
+  // Create UefiDisplay
+  let mode = gop.current_mode_info();
+  let mut display = UefiDisplay::new(gop.frame_buffer(), mode).unwrap();
 
-    // Create UefiDisplay
-    let mode = gop.current_mode_info();
-    let mut display = UefiDisplay::new(gop.frame_buffer(), mode);
+  // Create a new character style
+  let style = MonoTextStyle::new(&FONT_6X10, Rgb888::WHITE);
 
-    // Tint the entire screen cyan
-    display.fill_entire(Rgb888::CYAN).unwrap();
+  // Create a new text
+  let text = Text::new("Hello World!", Point { x: 30, y: 100 }, style);
 
-    // Draw everything
-    display.flush();
+  // Draw the text on the display
+  text.draw(&mut display).unwrap();
 
-    // wait 10000000 microseconds (10 seconds)
-    boot_services.stall(10_000_000);
+  // Flush everything
+  display.flush();
 
-    Status::SUCCESS
+  // wait 10000000 microseconds (10 seconds)
+  boot::stall(10_000_000);
+
+  Status::SUCCESS
 }
 ```
 
