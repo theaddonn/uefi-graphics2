@@ -2,6 +2,7 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
+use embedded_graphics::pixelcolor::RgbColor;
 use embedded_graphics::{
     draw_target::DrawTarget,
     geometry::{OriginDimensions, Size},
@@ -10,7 +11,6 @@ use embedded_graphics::{
     primitives::Rectangle,
     Pixel,
 };
-use embedded_graphics::pixelcolor::RgbColor;
 use uefi::proto::console::gop::{FrameBuffer, ModeInfo};
 
 pub use crate::error::UefiDisplayError;
@@ -68,11 +68,7 @@ impl UefiDisplay {
     pub fn flush(&self) {
         // SAFETY: We know both buffers are at least buffer.len() bytes long.
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                self.buffer.as_ptr(),
-                self.fb_ptr,
-                self.buffer.len(),
-            );
+            core::ptr::copy_nonoverlapping(self.buffer.as_ptr(), self.fb_ptr, self.buffer.len());
         }
     }
 }

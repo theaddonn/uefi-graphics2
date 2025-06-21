@@ -4,7 +4,7 @@ use thiserror::Error;
 pub enum UefiDisplayError {
     #[error("Unsupported Color Format")]
     UnsupportedFormat,
-    #[error("Invalid Resolution")]   
+    #[error("Invalid Resolution")]
     InvalidResolution,
     #[error("Out of Bounds")]
     OutOfBounds,
