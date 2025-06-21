@@ -2,112 +2,84 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
-use core::marker::PhantomData;
-use core::ptr::copy;
-
-// for re-export
-pub use embedded_graphics;
-use embedded_graphics::draw_target::DrawTarget;
-use embedded_graphics::geometry::{OriginDimensions, Size};
-use embedded_graphics::pixelcolor::{IntoStorage, Rgb888, RgbColor};
-use embedded_graphics::prelude::Point;
-use embedded_graphics::primitives::Rectangle;
-use embedded_graphics::Pixel;
+use embedded_graphics::{
+    draw_target::DrawTarget,
+    geometry::{OriginDimensions, Size},
+    pixelcolor::{IntoStorage, Rgb888},
+    prelude::Point,
+    primitives::Rectangle,
+    Pixel,
+};
+use embedded_graphics::pixelcolor::RgbColor;
 use uefi::proto::console::gop::{FrameBuffer, ModeInfo};
 
 pub use crate::error::UefiDisplayError;
-
 pub mod error;
 
+/// A double‑buffered UEFI display that implements `embedded_graphics::DrawTarget<Rgb888>`.
 #[derive(Debug)]
 pub struct UefiDisplay {
-    frame_buffer: *mut u8,
-    double_buffer: *mut u8,
+    /// Raw UEFI frame buffer pointer
+    fb_ptr: *mut u8,
+    /// In‑memory double buffer (fully owned)
+    buffer: Vec<u8>,
     stride: u32,
     size: (u32, u32),
-    // width * height * 4 (4 = red + green + blue + reserved)
-    buffer_size: u64,
 }
 
 impl UefiDisplay {
+    /// Create a new, cleared-to-black `UefiDisplay`.
     pub fn new(
         mut frame_buffer: FrameBuffer,
         mode_info: ModeInfo,
     ) -> Result<Self, UefiDisplayError> {
-        let mut display = Self {
-            frame_buffer: frame_buffer.as_mut_ptr(),
-            double_buffer: Vec::with_capacity(
-                mode_info.resolution().0 * mode_info.resolution().1 * 4,
-            )
-            .as_mut_ptr(),
-            stride: mode_info.stride() as u32,
-            size: (
-                mode_info.resolution().0 as u32,
-                mode_info.resolution().1 as u32,
-            ),
-            buffer_size: (mode_info.resolution().0 * mode_info.resolution().1 * 4) as u64,
+        let (width, height) = (
+            mode_info.resolution().0 as u32,
+            mode_info.resolution().1 as u32,
+        );
+        let stride = mode_info.stride() as u32;
+        let buf_len = width
+            .checked_mul(height)
+            .and_then(|p| p.checked_mul(4))
+            .ok_or(UefiDisplayError::InvalidResolution)?;
+
+        // Allocate zeroed buffer to avoid UB
+        let mut buffer = Vec::new();
+        buffer.resize(buf_len as usize, 0);
+
+        let mut display = UefiDisplay {
+            fb_ptr: frame_buffer.as_mut_ptr(),
+            buffer,
+            stride,
+            size: (width, height),
         };
 
-        match display.fill_entire(Rgb888::BLACK) {
-            Ok(_) => Ok(display),
-            Err(e) => Err(e),
-        }
+        // Fill to black
+        display.fill_solid(
+            &Rectangle::new(Point::zero(), Size::new(width, height)),
+            Rgb888::BLACK,
+        )?;
+        display.flush();
+
+        Ok(display)
     }
 
-    /// # Safety
-    ///
-    /// In [UefiDisplay::new] the screen gets set to a default color (Black).
-    /// But [UefiDisplay::new_unsafe] doesn't do that,
-    /// this may lead to a corrupted screen with a default color
-    /// (Tests show that the screen may be initialized with a grayish color).
-    /// This can easily be fixed by just using
-    /// [UefiDisplay::new].
-    pub unsafe fn new_unsafe(mut frame_buffer: FrameBuffer, mode_info: ModeInfo) -> Self {
-        Self {
-            frame_buffer: frame_buffer.as_mut_ptr(),
-            double_buffer: Vec::with_capacity(
-                mode_info.resolution().0 * mode_info.resolution().1 * 4,
-            )
-            .as_mut_ptr(),
-            stride: mode_info.stride() as u32,
-            size: (
-                mode_info.resolution().0 as u32,
-                mode_info.resolution().1 as u32,
-            ),
-            buffer_size: (mode_info.resolution().0 * mode_info.resolution().1 * 4) as u64,
-        }
-    }
-
-    /// Fills the entire screen with a given color.
-    pub fn fill_entire(&mut self, color: Rgb888) -> Result<(), UefiDisplayError> {
-        self.fill_solid(
-            &Rectangle {
-                top_left: Point { x: 0, y: 0 },
-                size: Size {
-                    width: self.size.0,
-                    height: self.size.1,
-                },
-            },
-            color,
-        )
-    }
-
-    /// Copies the framebuffer into the uefi framebuffer.
-    /// This function is needed to draw everything.
-    pub fn flush(&mut self) {
+    /// Copies the in‑memory buffer out to the UEFI frame buffer.
+    pub fn flush(&self) {
+        // SAFETY: We know both buffers are at least buffer.len() bytes long.
         unsafe {
-            copy(
-                self.double_buffer,
-                self.frame_buffer,
-                self.buffer_size as usize,
-            )
+            core::ptr::copy_nonoverlapping(
+                self.buffer.as_ptr(),
+                self.fb_ptr,
+                self.buffer.len(),
+            );
         }
     }
 }
 
 impl OriginDimensions for UefiDisplay {
     fn size(&self) -> Size {
-        Size::from(self.size)
+        Size::new(self.size.0, self.size.1)
     }
 }
 
@@ -119,24 +91,31 @@ impl DrawTarget for UefiDisplay {
     where
         I: IntoIterator<Item = Pixel<Self::Color>>,
     {
-        let pixels = pixels.into_iter();
+        let (width, _height) = self.size;
+        let stride = self.stride as usize;
+        let buf = &mut self.buffer;
 
-        for Pixel(point, color) in pixels {
-            let bytes: u32 = color.into_storage();
-            let stride: u64 = self.stride as u64;
-            let (x, y): (u64, u64) = (point.x as u64, point.y as u64);
+        for Pixel(Point { x, y }, color) in pixels.into_iter() {
+            // bounds‑check
+            if x < 0 || y < 0 {
+                continue;
+            }
+            let (x, y): (usize, usize) = (x as usize, y as usize);
+            if x >= width as usize {
+                continue;
+            }
 
-            let index: u64 = y
-                .overflowing_mul(stride)
-                .0
-                .overflowing_add(x)
-                .0
-                .overflowing_mul(4)
-                .0;
+            // compute byte index safely
+            let idx = y
+                .checked_mul(stride)
+                .and_then(|row| row.checked_add(x))
+                .and_then(|pix| pix.checked_mul(4))
+                .ok_or(UefiDisplayError::OutOfBounds)?;
 
-            unsafe { (self.double_buffer.add(index as usize) as *mut u32).write_volatile(bytes) };
+            let pixel_val: u32 = color.into_storage();
+            let pixel_bytes = pixel_val.to_le_bytes();
+            buf[idx..idx + 4].copy_from_slice(&pixel_bytes);
         }
-
         Ok(())
     }
 }
